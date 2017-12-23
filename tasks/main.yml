@@ -1,0 +1,85 @@
+---
+# tasks file for desktop
+
+# Install Dependencies
+- name: Install desktop dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ desktop_apt_dependencies | list }}"
+  when: desktop_apt_dependencies | length
+
+# Install Packages
+- name: Add desktop PPA repositories
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items: "{{ desktop_apt_ppa }}"
+  when: desktop_apt_ppa | length
+
+- name: Install desktop software packages
+  apt:
+    name: "{{ item }}"
+    state: "{{ desktop_apt_state }}"
+  with_items: "{{ desktop_apt_packages | list }}"
+  when: desktop_apt_packages | length
+
+# Create Directories
+- name: Make sure /usr/local/share/applications exists
+  file:
+    path: /usr/local/share/applications
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+
+- name: Make sure startup application directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/autostart"
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+
+# Set Permissions
+- name: Set jack.sh with proper permissions
+  file:
+    dest: /etc/acpi/jack.sh
+    owner: root
+    group: root
+    mode: 0755
+
+# Imagemagick Configuration
+- name: Copy imagemagick desktop entry files
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/share/applications/{{ item }}"
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+  with_items:
+    - display-im6.q16.desktop
+    - display-im6.desktop
+
+# Desktop Autostart
+- name: Add new startup entries
+  template: 
+    src: desktop.j2 
+    dest: "{{ ansible_env.HOME }}/.config/autostart/{{ item.name | lower }}.desktop" 
+    owner: "{{ ansible_env.USER }}" 
+    group: "{{ ansible_env.USER }}"
+  with_items: "{{ desktop_autostart_add }}"
+
+- name: Copy startup applications
+  copy:
+    src: "/etc/xdg/autostart/{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.config/autostart/{{ item }}"
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    force: no
+  with_items: "{{ desktop_autostart_remove }}"
+
+- name: Disable startup applications
+  lineinfile:
+    dest: "{{ ansible_env.HOME }}/.config/autostart/{{ item }}"
+    regexp: '^X-GNOME-Autostart-enabled='
+    line: 'X-GNOME-Autostart-enabled=false'
+    state: present
+  with_items: "{{ desktop_autostart_remove }}"

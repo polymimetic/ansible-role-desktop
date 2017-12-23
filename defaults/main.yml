@@ -1,0 +1,76 @@
+---
+# defaults file for desktop
+
+# Determines the state for packages installed on the system. Available values are `present` or `latest`.
+desktop_apt_state: latest
+
+# Array of desktop apt package dependencies. These packages should be installed before all others.
+desktop_apt_dependencies:
+  - xvfb
+  - acpid
+  - imagemagick
+
+# Array of Personal Package Archives (PPAs) to add. Additional PPAs can be found at: https://launchpad.net/.
+desktop_apt_ppa:
+  - ppa:nilarimogard/webupd8    # General PPA
+  - ppa:yktooo/ppa              # Indicator sound switcher
+  - ppa:dawidd0811/neofetch     # Neofetch
+  - ppa:giuspen/ppa             # Cherrytree
+  - ppa:eugenesan/ppa           # KeepassX
+  - ppa:caffeine-developers/ppa # Caffeine
+  - ppa:fossfreedom/indicator-sysmonitor # Indicator Sysmonitor
+
+# Array of gui desktop software packages to install
+desktop_apt_packages_gui:
+  - bleachbit
+  - filezilla
+  - gpick
+  - meld # Diff / merge tool
+  - mpv
+  - cherrytree
+  - keepassx
+  - caffeine
+  - font-manager
+  - screenruler
+  - transmission
+  - typecatcher
+  - lubuntu-software-center
+  - indicator-sound-switcher
+  - xfpanel-switch
+  - indicator-sysmonitor
+  - easytag # audio files metadata management
+  - byzanz # screen recording
+  - geany # texteditor
+  - pinta # light paint.net equivalent
+  - rhythmbox
+  - ubuntu-restricted-extras # MP3, Microsoft fonts, Flash plugin, LAME and DVD playback
+  - unetbootin # create bootable USB drives
+  - tilda # lighter than guake
+  - fonts-hack-ttf
+
+# Array of cli desktop software packages to install
+desktop_apt_packages_cli:
+  - colortest
+  - htop
+  - httping
+  - iftop
+  - iotop
+  - xclip # to manipulate the clipboard
+  - lastpass-cli
+  - trash-cli
+  - neofetch
+  - rxvt-unicode-256color
+  - sox # to play sounds
+
+# Array of desktop apt packages to install.
+desktop_apt_packages: "{{ desktop_apt_packages_gui + desktop_apt_packages_cli }}"
+
+# Desktop autostart applications
+# desktop_autostart_add:
+#   - { name: Tilda , exec: /usr/bin/tilda }
+
+# desktop_autostart_remove:
+#   - deja-dup-monitor.desktop
+#   - onboard-autostart.desktop
+#   - orca-autostart.desktop
+#   - vino-server.desktop

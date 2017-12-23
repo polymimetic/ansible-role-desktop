@@ -1,0 +1,29 @@
+---
+services: docker
+
+env:
+  # Test package install on all supported OSes.
+  - distro: gallium
+    playbook: test.yml
+  - distro: xenial
+    playbook: test.yml
+
+script:
+  # Configure test script so we can run extra tests after playbook is run.
+  - export container_id=$(date +%s)
+  - export cleanup=false
+  - export test_suite=false
+
+  # Run tests.
+  - chmod +x ${PWD}/tests/run-test.sh
+  - ${PWD}/tests/run-test.sh
+
+  # Ensure desktop is installed and working.
+  - 'docker exec --tty ${container_id} env TERM=xterm which desktop'
+  - 'docker exec --tty ${container_id} env TERM=xterm test -x /usr/bin/desktop'
+
+  - 'docker exec --tty ${container_id} env TERM=xterm desktop --version'
+  - 'docker exec --tty ${container_id} env TERM=xterm /usr/bin/desktop --version | grep -qF "$DESKTOP_VERSION"'
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
